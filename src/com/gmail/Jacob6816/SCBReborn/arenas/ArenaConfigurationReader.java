@@ -20,6 +20,9 @@ public class ArenaConfigurationReader {
 
 	private File				arenaFile;
 	private FileConfiguration	config;
+	private String				keywordRegion	= "Region.";
+	private String				keywordSign		= "Signs.";
+	private String				keywordLocation	= "Location.";
 
 	public ArenaConfigurationReader(File arenaFile) {
 		this.arenaFile = arenaFile;
@@ -40,19 +43,26 @@ public class ArenaConfigurationReader {
 		config.set("NAME", newFile);
 	}
 
-	public void reloadConfigurationFile() {
-		this.config = YamlConfiguration.loadConfiguration(arenaFile);
+	/* Getters */
+
+	public String getGameName() {
+		return config.getString("NAME");
 	}
 
-	public void saveConfigurationFile() {
-		try {
-			config.save(arenaFile);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public ArrayList<Location> getGameSpawnPoints() {
+		ArrayList<Location> locations = new ArrayList<Location>();
+		ConfigurationSection spawnSection = config.getConfigurationSection(keywordLocation + ".Spawns");
+		if (spawnSection == null) return locations;
+		Map<String, Object> points = spawnSection.getValues(false);
+		for (Object o : points.values())
+			try {
+				String s = (String) o;
+				Location parsed = str2loc(s);
+				locations.add(parsed);
+			} catch (Exception exc) {
+			}
+		return locations;
 	}
-
-	private String	keywordRegion	= "Region.";
 
 	public CuboidSelection getCuboidSelection() {
 		String worldName = config.getString(keywordRegion + "world");
@@ -65,6 +75,21 @@ public class ArenaConfigurationReader {
 		int maxZ = config.getInt(keywordRegion + "maxZ");
 		return new CuboidSelection(world, new Vector(minX, minY, minZ), new Vector(maxX, maxY, maxZ));
 	}
+
+	public Map<String, Object> getSignMap() {
+		ConfigurationSection mapSection = config.getConfigurationSection(keywordSign);
+		if (mapSection == null) return new HashMap<String, Object>();
+		return mapSection.getValues(false);
+	}
+
+	public Location getGameLobby() {
+		String location = config.getString(keywordLocation + ".Lobby", null);
+		Location ans = str2loc(location);
+		if (ans == null) ans = Bukkit.getWorlds().get(0).getSpawnLocation();
+		return ans;
+	}
+
+	/* Setters */
 
 	public void setCuboidSelection(CuboidSelection gameRegion) {
 		Vector lowest = gameRegion.getNativeMinimumPoint();
@@ -79,23 +104,35 @@ public class ArenaConfigurationReader {
 		saveConfigurationFile();
 	}
 
-	private String	keywordSign	= "sign";
-
-	public Map<String, Object> getSignMap() {
-		ConfigurationSection mapSection = config.getConfigurationSection(keywordSign);
-		if (mapSection == null) return new HashMap<String, Object>();
-		return mapSection.getValues(false);
-	}
-
 	public void setSignMap(Map<String, Object> map) {
-		config.set(keywordSign, null);
-		if (!map.isEmpty())
-			for (String key : map.keySet())
-				config.set(key, map.get(key));
+		config.set(keywordSign.substring(0, keywordSign.length() - 1), null);
+		if (!map.isEmpty()) {
+			int i = 0;
+			for (Object value : map.values()) {
+				config.set(keywordSign + i, value);
+				i++;
+			}
+		}
 		saveConfigurationFile();
 	}
 
-	private String	keywordLocation	= "Location.";
+	public void setGameLobby(Location lobbyLocation) {
+		config.set(keywordLocation + ".Lobby", loc2str(lobbyLocation));
+		saveConfigurationFile();
+	}
+
+	public void setSpawnPoints(ArrayList<Location> spawnPoints) {
+		String key = keywordLocation + ".Spawns.";
+		config.set(key.substring(0, key.length() - 1), null);
+		int i = 0;
+		for (Location location : spawnPoints) {
+			config.set(key + i, loc2str(location));
+			i++;
+		}
+		saveConfigurationFile();
+	}
+
+	/* Private Methods */
 
 	public static Location str2loc(String input) {
 		if (input.length() <= 0 || !input.contains(":")) return null;
@@ -136,45 +173,16 @@ public class ArenaConfigurationReader {
 		return s.substring(0, Math.min(s.length(), deci + length));
 	}
 
-	public Location getGameLobby() {
-		String location = config.getString(keywordLocation + ".Lobby", null);
-		Location ans = str2loc(location);
-		if (ans == null) ans = Bukkit.getWorlds().get(0).getSpawnLocation();
-		return ans;
-	}
-
-	public void setGameLobby(Location lobbyLocation) {
-		config.set(keywordLocation + ".Lobby", loc2str(lobbyLocation));
-		saveConfigurationFile();
-	}
-
-	public ArrayList<Location> getGameSpawnPoints() {
-		ArrayList<Location> locations = new ArrayList<Location>();
-		ConfigurationSection spawnSection = config.getConfigurationSection(keywordLocation + ".Spawns");
-		if (spawnSection == null) return locations;
-		Map<String, Object> points = spawnSection.getValues(false);
-		for (Object o : points.values())
-			try {
-				String s = (String) o;
-				Location parsed = str2loc(s);
-				locations.add(parsed);
-			} catch (Exception exc) {
-			}
-		return locations;
-	}
-
-	public void setSpawnPoints(ArrayList<Location> spawnPoints) {
-		String key = keywordLocation + ".Spawns.";
-		int i = 0;
-		for (Location location : spawnPoints) {
-			config.set(key + i, loc2str(location));
-			i++;
+	public void saveConfigurationFile() {
+		try {
+			config.save(arenaFile);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		saveConfigurationFile();
 	}
 
-	public String getGameName() {
-		return config.getString("NAME");
+	public void reloadConfigurationFile() {
+		this.config = YamlConfiguration.loadConfiguration(arenaFile);
 	}
 
 }

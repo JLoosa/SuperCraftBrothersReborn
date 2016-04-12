@@ -66,6 +66,7 @@ public class PlayerClassManager {
 		Iterator<String> classIterator = playerClasses.keySet().iterator();
 		while (classIterator.hasNext()) {
 			String name = classIterator.next();
+			if(!playerClasses.get(name).isChanged()) continue;
 			try {
 				File file = new File(saveFolder, name.toUpperCase());
 				file.createNewFile();

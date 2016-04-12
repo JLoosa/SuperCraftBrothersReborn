@@ -28,8 +28,8 @@ public class Arena {
 	private Gameboard					gameboard;
 	private Lobbyboard					lobbyboard;
 	private SimpleArenaSignManager		signManager;
-	private int							minPlayers	= 4;
-	private int							maxPlayers	= 8;
+	private int							minPlayers;
+	private int							maxPlayers;
 	private HashMap<String, SCBRPlayer>	players;
 	private int							numberOfLives;
 	private Location					gameLobby;
@@ -55,9 +55,9 @@ public class Arena {
 		players = new HashMap<String, SCBRPlayer>();
 		lobbyboard = new Lobbyboard(this);
 		signManager = new SimpleArenaSignManager(acr.getSignMap(), this);
-		this.maxPlayers = SCBReborn.getSCBR().getConfig().getInt("Game.MaxPlayers");
-		this.minPlayers = SCBReborn.getSCBR().getConfig().getInt("Game.MinPlayers");
-		this.numberOfLives = SCBReborn.getSCBR().getConfig().getInt("Game.PlayerLives");
+		this.minPlayers = SCBReborn.getSCBR().getConfig().getInt("I:MinPlayers", 2);
+		this.maxPlayers = SCBReborn.getSCBR().getConfig().getInt("I:MaxPlayers", 8);
+		this.numberOfLives = SCBReborn.getSCBR().getConfig().getInt("I:PlayerLives", 3);
 		lobbyboard.setMinimumPlayers(minPlayers);
 		spawnPoints = acr.getGameSpawnPoints();
 		signManager.updateAllSigns();
@@ -69,6 +69,7 @@ public class Arena {
 		if (spawnPoints.size() == 0) return false;
 		if (PlayerClassManager.getInstance().getPlayerClasses().length == 0) return false;
 		gameState = ArenaState.LOBBY;
+		signManager.updateAllSigns();
 		return true;
 	}
 
@@ -170,6 +171,7 @@ public class Arena {
 		}
 		players.clear();
 		arenaConfigurationReader.setSpawnPoints(spawnPoints);
+		arenaConfigurationReader.setSignMap(signManager.serialize());
 	}
 
 	public Location getLobbyLocation() {
@@ -205,6 +207,7 @@ public class Arena {
 		scbr.restorePlayer();
 		scbr.dispose();
 		players.remove(player.getName());
+		signManager.updateAllSigns();
 	}
 
 	public void setLobbyLocation(Location newLobby) {

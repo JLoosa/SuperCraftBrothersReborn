@@ -32,7 +32,7 @@ public class SimpleArenaSignManager implements ConfigurationSerializable {
 			public void run() {
 				updateAllSigns();
 			}
-		}.runTaskTimer(SCBReborn.getSCBR(), 20, 100);
+		}.runTaskTimer(SCBReborn.getSCBR(), 20, 20);
 	}
 
 	public SimpleArenaSignManager(Map<String, Object> constructorMap, Arena arena) {

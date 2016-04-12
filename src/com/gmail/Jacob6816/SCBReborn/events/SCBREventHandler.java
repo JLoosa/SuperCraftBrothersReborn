@@ -46,7 +46,7 @@ public class SCBREventHandler implements Listener
 		String[] lines = sign.getLines();
 		String mainLine = ChatColor.stripColor(lines[0]);
 		final Player player = event.getPlayer();
-		if (mainLine.equalsIgnoreCase("[SCBR]")) {
+		if (mainLine.equalsIgnoreCase("[SCBReborn]")) {
 			String arenaName = ChatColor.stripColor(lines[1]);
 			player.performCommand("SCBReborn Join " + arenaName);
 			return;
@@ -70,14 +70,22 @@ public class SCBREventHandler implements Listener
 
 	@EventHandler
 	public void onSignChange(SignChangeEvent e) {
-		if (!e.getPlayer().hasPermission("SCBR.Signs.Create")) return;
-		if (e.getLine(0).equalsIgnoreCase("[SCBR]")) {
+		if (e.getLine(0).equalsIgnoreCase("[SCBR]") || e.getLine(0).equalsIgnoreCase("[SCBReborn]")) {
+			if (!e.getPlayer().hasPermission("SCBR.Signs.Create")) {
+				MessageManager.messageRecipient(e.getPlayer(), ChatColor.RED + "You do not have permission to create arena signs");
+				e.getBlock().breakNaturally();
+				return;
+			}
 			final Sign sign = (Sign) e.getBlock().getState();
 			String name = e.getLine(1);
-			Arena arena = ArenaManager.getAM().getArena(name);
+			final Arena arena = ArenaManager.getAM().getArena(name);
 			if (arena != null) {
-				arena.addAndUpdateNewSign(sign);
-				updateSignForArena(e, arena);
+				new BukkitRunnable() {
+					public void run() {
+						arena.addAndUpdateNewSign(sign);
+						updateSignForArena(sign, arena);
+					}
+				}.runTaskLater(SCBReborn.getSCBR(), 3);
 			}
 			else {
 				e.getBlock().breakNaturally();
@@ -194,10 +202,11 @@ public class SCBREventHandler implements Listener
 
 	}
 
-	private void updateSignForArena(SignChangeEvent sign, Arena arena) {
+	private void updateSignForArena(Sign sign, Arena arena) {
 		sign.setLine(0, ChatColor.AQUA + "[SCBReborn]");
 		sign.setLine(1, arena.getGameName());
 		sign.setLine(2, arena.getGameState().displayText());
 		sign.setLine(3, arena.getPlayers().size() + " / " + arena.getMaxPlayers());
+		sign.update(true, false);
 	}
 }

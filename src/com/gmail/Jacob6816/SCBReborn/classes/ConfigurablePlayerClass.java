@@ -8,11 +8,13 @@ public class ConfigurablePlayerClass implements Comparable<ConfigurablePlayerCla
 
 	private String	name;
 	private ItemStack[]	inventory, armor;
+	private boolean		changed;
 
 	public ConfigurablePlayerClass(String className, ItemStack[] armor, ItemStack[] inventory) {
 		this.name = className;
 		this.armor = armor;
 		this.inventory = inventory;
+		changed = false;
 	}
 
 	public ItemStack[] getClassArmor() {
@@ -21,6 +23,7 @@ public class ConfigurablePlayerClass implements Comparable<ConfigurablePlayerCla
 
 	public void setClassArmor(ItemStack[] newArmor) {
 		this.armor = newArmor;
+		changed = true;
 	}
 
 	public ItemStack[] getClassInventory() {
@@ -29,6 +32,7 @@ public class ConfigurablePlayerClass implements Comparable<ConfigurablePlayerCla
 
 	public void setClassInventory(ItemStack[] newInventory) {
 		this.inventory = newInventory;
+		changed = true;
 	}
 
 	public void applyInventory(Player player) {
@@ -47,5 +51,9 @@ public class ConfigurablePlayerClass implements Comparable<ConfigurablePlayerCla
 
 	public ChatColor getClassColor() {
 		return ChatColor.BOLD;
+	}
+
+	public boolean isChanged() {
+		return this.changed;
 	}
 }

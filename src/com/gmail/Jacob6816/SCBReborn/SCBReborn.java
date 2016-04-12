@@ -1,5 +1,7 @@
 package com.gmail.Jacob6816.SCBReborn;
 
+import java.io.File;
+
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
@@ -28,19 +30,16 @@ public class SCBReborn extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		File configFile = new File(getDataFolder(), "config.yml");
+		if (!configFile.exists()) {
+			saveDefaultConfig();
+		}
 		if (getWorldEdit() == null) {
 			getLogger().severe("WorldEdit could not be found. Please make sure that it is correctly installed.");
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
 		instance = this;
-		if (!getDataFolder().exists()) getDataFolder().mkdirs();
-		if (getConfig() == null) {
-			getConfig().addDefault("Game.MinPlayers", 2);
-			getConfig().addDefault("Game.MaxPlayers", 8);
-			getConfig().addDefault("Game.PlayerLives", 8);
-			saveDefaultConfig();
-		}
 		PlayerClassManager.getInstance().setClassInv();
 		Bukkit.getPluginManager().registerEvents(new SCBREventHandler(), this);
 		getCommand("SCBReborn").setExecutor(new SCBRCommandExecutor());

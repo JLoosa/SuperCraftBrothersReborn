@@ -35,8 +35,9 @@ public class CommandJoinArena extends SCBRCommand {
 			MessageManager.messageRecipient(player, ChatColor.RED + "That arena is not joinable");
 			return;
 		}
-		
+
 		arena.addPlayer(player);
+		MessageManager.messageRecipient(player, "You have joined the arena '" + arena.getGameName() + "'");
 	}
 
 }

@@ -1,9 +1,10 @@
 # Game Settings
 
-Game:
-  # Players needed for the game to start
-  MinPlayers: 2
-  # Max players in a game
-  MaxPlayers: 8
-  # Lives per player
-  PlayerLives: 3
+# Players needed for the game to start
+I:MinPlayers: 2
+
+# Max players in a game
+I:MaxPlayers: 8
+
+# Lives per player
+I:PlayerLives: 3
