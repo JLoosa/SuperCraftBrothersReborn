@@ -1,0 +1,17 @@
+Configure Events =>
+	Sign clicks
+	Falling out of Arena
+	Player deaths
+	Inventory clicks for menus(?)
+
+Configure Commends =>
+	Join Arena
+	Leave Arena
+	Create Arena
+	Delete Arena
+	Config Arena
+		Set Lobby
+		Set Spawn point
+		Set Lives
+	View plugin info
+	View Help

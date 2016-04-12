@@ -1,0 +1,10 @@
+name: SuperCraftBrosReborn
+author: Jacob Ryan
+version: 1.0
+main: com.gmail.Jacob6816.SCBReborn.SCBReborn
+commands:
+  SCBReborn:
+    description: Super Craft Brothers Reborn
+    usage: /SCBReborn (command) (args)
+    aliases: [scbr, scb]
+depend: [WorldEdit]
