@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.Jacob6816.SCBReborn.SCBReborn;
 import com.gmail.Jacob6816.SCBReborn.classes.PlayerClassManager;
@@ -112,12 +113,17 @@ public class Arena {
 
 	public void respawnPlayer(PlayerRespawnEvent event) {
 		if (players.isEmpty()) return;
-		for (SCBRPlayer ingame : players.values()) {
+		for (final SCBRPlayer ingame : players.values()) {
 			if (!ingame.getName().equals(event.getPlayer().getName())) continue;
 			if (ingame.stillHasLives())
 				event.setRespawnLocation(locateSafeSpawn());
+			new BukkitRunnable() {
+				public void run() {
+					ingame.applyClass();
+				}
+			}.runTaskLater(SCBReborn.getSCBR(), 3);
+			return;
 		}
-		return;
 	}
 
 	public String getGameName() {
@@ -134,16 +140,20 @@ public class Arena {
 
 	public void startGame() {
 		lobbyboard.dispose();
+		lobbyboard = null;
 		gameboard = new Gameboard(this);
 		gameboard.preformInitialSetup();
 		gameboard.reallocateTeams();
 		gameboard.applyToPlayers();
+		int i = 0;
+		for (SCBRPlayer player : players.values()) {
+			player.teleport(spawnPoints.get(i));
+			player.applyClass();
+			i++;
+			i %= spawnPoints.size();
+		}
 		this.gameState = ArenaState.INGAME;
 		signManager.updateAllSigns();
-	}
-
-	public void onTick() {
-		//TODO
 	}
 
 	public boolean isJoinable() {
@@ -152,8 +162,11 @@ public class Arena {
 	}
 
 	public void onSecond() {
-		if (lobbyboard != null) lobbyboard.startGame(true, true);
-
+		if (lobbyboard != null) {
+			lobbyboard.updateLobby(players.size());
+			lobbyboard.startGame(true, true);
+		}
+		else if (gameState == ArenaState.LOBBY) System.out.println("Lobbyboard is null");
 	}
 
 	public int getLivesForArena() {
@@ -186,7 +199,7 @@ public class Arena {
 		return maxPlayers;
 	}
 
-	public void addAndUpdateNewSign(Sign sign) {
+	public void addNewSign(Sign sign) {
 		signManager.addSigns(sign);
 	}
 
@@ -194,11 +207,12 @@ public class Arena {
 		SCBRPlayer scbrPlayer = new SCBRPlayer(player, this);
 		players.put(player.getName(), scbrPlayer);
 		signManager.updateAllSigns();
+		lobbyboard.startGame(true, true);
 	}
 
 	public void onDeath(Player p, String deathMessage) {
 		MessageManager.messageGame(this, deathMessage);
-		getSCBRPlayerFor(p).reduceLives();
+		MessageManager.messageGame(this, p.getName() + " has " + getSCBRPlayerFor(p).reduceLives() + " lives left");
 	}
 
 	public void removePlayer(Player player) {
@@ -209,6 +223,8 @@ public class Arena {
 		players.remove(player.getName());
 		signManager.updateAllSigns();
 	}
+
+	/* Unimportant Methods */
 
 	public void setLobbyLocation(Location newLobby) {
 		this.gameLobby = newLobby;
@@ -228,8 +244,11 @@ public class Arena {
 		return spawnPoints.size();
 	}
 
-	public boolean tryDisable() {
-		disableArena();
-		return true;
+	public void setGameRegion(CuboidSelection selection) {
+		this.gameRegion = selection;
+	}
+
+	public int getMinPlayers() {
+		return minPlayers;
 	}
 }

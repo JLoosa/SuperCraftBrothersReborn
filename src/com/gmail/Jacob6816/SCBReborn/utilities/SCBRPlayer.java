@@ -3,6 +3,7 @@ package com.gmail.Jacob6816.SCBReborn.utilities;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +17,6 @@ import com.gmail.Jacob6816.SCBReborn.classes.PlayerClassManager;
 public class SCBRPlayer {
 
 	private Player					player;
-	private Arena					gameArena;
 	private ConfigurablePlayerClass	playerClass;
 	private int						livesRemaining;
 	private PlayerBackup			playerBackup;
@@ -25,10 +25,22 @@ public class SCBRPlayer {
 		this.player = player;
 		playerBackup = new PlayerBackup();
 		playerBackup.saveState(this.player);
-		this.gameArena = game;
 		this.playerClass = PlayerClassManager.getInstance().getPlayerClasses()[0];
 		livesRemaining = game.getLivesForArena();
 		teleport(game.getLobbyLocation());
+	}
+
+	public void setPlayerClass(ConfigurablePlayerClass configurablePlayerClass) {
+		this.playerClass = configurablePlayerClass;
+	}
+
+	public void setLevel(int level) {
+		player.setLevel(level);
+	}
+
+	public void applyClass() {
+		player.getInventory().setArmorContents(playerClass.getClassArmor());
+		player.getInventory().setContents(playerClass.getClassInventory());
 	}
 
 	public void teleport(Location location) {
@@ -43,16 +55,13 @@ public class SCBRPlayer {
 		return player.getLocation().distance(target);
 	}
 
-	public Arena getGame() {
-		return gameArena;
+	public int reduceLives() {
+		return reduceLives(1);
 	}
 
-	public void reduceLives() {
-		reduceLives(1);
-	}
-
-	public void reduceLives(int amount) {
+	public int reduceLives(int amount) {
 		this.livesRemaining -= amount;
+		return livesRemaining;
 	}
 
 	public void sendMessage(String string) {
@@ -81,7 +90,6 @@ public class SCBRPlayer {
 
 	public void dispose() {
 		player = null;
-		gameArena = null;
 		playerClass = null;
 		livesRemaining = 0;
 		playerBackup.dispose();
@@ -139,11 +147,8 @@ public class SCBRPlayer {
 			player.setFoodLevel(foodLevel);
 			player.addPotionEffects(potionEffects);
 			player.teleport(lastLocation);
+			player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 		}
 
-	}
-
-	public void setPlayerClass(ConfigurablePlayerClass configurablePlayerClass) {
-		this.playerClass = configurablePlayerClass;
 	}
 }

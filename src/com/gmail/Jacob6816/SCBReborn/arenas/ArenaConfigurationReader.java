@@ -83,8 +83,8 @@ public class ArenaConfigurationReader {
 	}
 
 	public Location getGameLobby() {
-		String location = config.getString(keywordLocation + ".Lobby", null);
-		Location ans = str2loc(location);
+		String location = config.getString(keywordLocation + ".Lobby", SCBReborn.getSCBR().getConfig().getString("GLOBAL.Lobby", null));
+		Location ans = (location == null ? null : str2loc(location));
 		if (ans == null) ans = Bukkit.getWorlds().get(0).getSpawnLocation();
 		return ans;
 	}

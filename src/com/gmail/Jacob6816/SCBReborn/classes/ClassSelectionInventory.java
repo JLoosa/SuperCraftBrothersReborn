@@ -34,6 +34,7 @@ public class ClassSelectionInventory extends AbstractModularInventory {
 
 	@Override
 	public void onVerifiedInventoryClick(InventoryClickEvent event) {
+		if (event.getSlot() >= PlayerClassManager.getInstance().getPlayerClasses().length) return;
 		Player player = (Player) event.getWhoClicked();
 		Arena arena = ArenaManager.getAM().getPlayerArena(player);
 		ConfigurablePlayerClass playerClass = PlayerClassManager.getInstance().getPlayerClasses()[event.getSlot()];

@@ -16,7 +16,6 @@ public class Lobbyboard {
 	private Arena		arenaObject			= null;
 	private String		scoreboardTitle		= null;
 	private int			requiredToStart		= 8;
-	private int			players				= 0;
 	private int			countdown			= 30;
 	private boolean		countingDown		= false;
 
@@ -24,6 +23,7 @@ public class Lobbyboard {
 		this.arenaObject = arena;
 		ingameScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 		scoreboardTitle = ChatColor.AQUA + arena.getGameName() + " Lobby";
+		setMinimumPlayers(arena.getMinPlayers());
 	}
 
 	public void preformInitialSetup() {
@@ -40,15 +40,22 @@ public class Lobbyboard {
 	}
 
 	public void updateLobby(int playerCount) {
-		Objective objective = ingameScoreboard.getObjective(DisplaySlot.SIDEBAR);
+		Objective objective = ingameScoreboard.getObjective(scoreboardTitle);
+		if (objective == null) {
+			objective = ingameScoreboard.registerNewObjective(scoreboardTitle, "dummy");
+			objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+		}
 		objective.getScore(currentlyWaiting).setScore(playerCount);
 		objective.getScore(playersNeeded).setScore(requiredToStart - playerCount);
-		this.players = playerCount;
 		if (countingDown) {
 			if (objective.getScore(playersNeeded).getScore() > 0) {
 				countingDown = false;
 				currentCount = 0;
 			}
+		}
+		for (SCBRPlayer player : arenaObject.getPlayers()) {
+			player.setScoreboard(ingameScoreboard);
+			player.setLevel(countdown - currentCount);
 		}
 	}
 
@@ -56,8 +63,9 @@ public class Lobbyboard {
 
 	public void startGame(boolean checkPlayers, boolean runCountdown) {
 		if (checkPlayers)
-			if (players - requiredToStart < 0) {
+			if (arenaObject.getPlayers().size() - requiredToStart < 0) {
 				currentCount = 0;
+				countingDown = false;
 				return;
 			}
 		if (runCountdown) {
@@ -78,7 +86,7 @@ public class Lobbyboard {
 	}
 
 	public void forceStart() {
-		// TODO start the game
+		arenaObject.startGame();
 	}
 
 	public void dispose() {
@@ -88,7 +96,6 @@ public class Lobbyboard {
 		arenaObject = null;
 		scoreboardTitle = null;
 		requiredToStart = 0;
-		players = 0;
 		countdown = 0;
 		countingDown = false;
 		currentCount = 0;

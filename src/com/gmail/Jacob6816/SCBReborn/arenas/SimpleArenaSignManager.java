@@ -67,11 +67,12 @@ public class SimpleArenaSignManager implements ConfigurationSerializable {
 	public void updateAllSigns() {
 		if (signList.isEmpty()) return;
 		for (Sign sign : signList)
-			try {
-				updateSign(sign);
-			} catch (Exception exc) {
-				signList.remove(sign);
-			}
+			if (sign.getChunk().isLoaded())
+				try {
+					updateSign(sign);
+				} catch (Exception exc) {
+					signList.remove(sign);
+				}
 	}
 
 	@Override

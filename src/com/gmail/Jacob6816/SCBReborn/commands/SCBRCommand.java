@@ -57,4 +57,8 @@ public abstract class SCBRCommand implements Comparable<SCBRCommand> {
 	public int compareTo(SCBRCommand o) {
 		return this.getName().compareTo(o.getName());
 	}
+
+	public String getPermissionNode() {
+		return this.permissionNode;
+	}
 }

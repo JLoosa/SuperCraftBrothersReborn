@@ -24,22 +24,14 @@ public class ArenaManager {
 		SCBReborn scbr = SCBReborn.getSCBR();
 		if (scbr == null) return;
 		tickRunnable = new BukkitRunnable() {
-			int	curr	= 0;
-
 			public void run() {
 				List<Arena> arenas = getAllArenas();
-				if (arenas.isEmpty()) return;
-				if (curr % 20 != 0)
+				if (arenas.isEmpty())
+					return;
 				for (Arena a : arenas)
-					a.onTick();
-				else
-				for (Arena a : arenas) {
-					a.onTick();
 					a.onSecond();
-				}
-
 			}
-		}.runTaskTimer(scbr, 5, 1);
+		}.runTaskTimer(scbr, 0, 20);
 	}
 
 	private ArrayList<Arena>	arenas;
@@ -63,23 +55,6 @@ public class ArenaManager {
 
 	public List<Arena> getAllArenas() {
 		return Collections.unmodifiableList(arenas);
-	}
-
-	public void runGameTicks() {
-		tickRunnable = new BukkitRunnable() {
-			int	tick	= 1;
-
-			public void run() {
-				if (arenas.isEmpty()) return;
-				for (Arena a : arenas)
-					a.onTick();
-				if (tick == 0)
-					for (Arena a : arenas)
-						a.onSecond();
-				tick++;
-				tick %= 20;
-			}
-		}.runTaskTimer(SCBReborn.getSCBR(), 0, 1);
 	}
 
 	public void loadGames() {

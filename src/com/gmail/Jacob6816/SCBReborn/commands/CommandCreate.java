@@ -32,9 +32,14 @@ public class CommandCreate extends SCBRCommand {
 			return;
 		}
 		String name = args[0];
-		Arena arena = new Arena(name, (CuboidSelection) selection);
+		Arena arena = ArenaManager.getAM().getArena(name);
+		if (arena != null) {
+			MessageManager.messageRecipient(player, ChatColor.RED + "The arena already exists");
+			return;
+		}
+		arena = new Arena(name, (CuboidSelection) selection);
 		ArenaManager.getAM().addArenaToList(arena);
-		MessageManager.messageRecipient(player, ChatColor.GREEN + "Arena '" + arena.getGameName() + "' was sucessfully created using your WorldEdit selection", ChatColor.GREEN + "Please be sure to set the player spawns");
+		MessageManager.messageRecipient(player, "Arena '" + arena.getGameName() + "' was sucessfully created using your WorldEdit selection", ChatColor.GREEN + "Please be sure to set the player spawns");
 	}
 
 }

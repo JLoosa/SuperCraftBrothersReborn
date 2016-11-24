@@ -24,8 +24,8 @@ public class CommandDisableArena extends SCBRCommand {
 			MessageManager.messageRecipient(player, ChatColor.RED + "That arena does not exist");
 			return;
 		}
-		if (arena.tryDisable()) MessageManager.messageRecipient(player, "Arena disabled");
-		else MessageManager.messageRecipient(player, ChatColor.RED + "Failed to disable arena");
+		arena.disableArena();
+		MessageManager.messageRecipient(player, "Arena disabled");
 	}
 
 }

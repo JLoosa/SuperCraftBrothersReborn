@@ -9,7 +9,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.Jacob6816.SCBReborn.arenas.ArenaManager;
 import com.gmail.Jacob6816.SCBReborn.classes.PlayerClassManager;
-import com.gmail.Jacob6816.SCBReborn.events.SCBREventHandler;
+import com.gmail.Jacob6816.SCBReborn.events.SCBRBlockEvents;
+import com.gmail.Jacob6816.SCBReborn.events.SCBRInventoryEvents;
+import com.gmail.Jacob6816.SCBReborn.events.SCBRPlayerEvents;
+import com.gmail.Jacob6816.SCBReborn.events.SCBRSignEvents;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class SCBReborn extends JavaPlugin {
@@ -41,7 +44,10 @@ public class SCBReborn extends JavaPlugin {
 		}
 		instance = this;
 		PlayerClassManager.getInstance().setClassInv();
-		Bukkit.getPluginManager().registerEvents(new SCBREventHandler(), this);
+		Bukkit.getPluginManager().registerEvents(new SCBRSignEvents(), this);
+		Bukkit.getPluginManager().registerEvents(new SCBRBlockEvents(), this);
+		Bukkit.getPluginManager().registerEvents(new SCBRPlayerEvents(), this);
+		Bukkit.getPluginManager().registerEvents(new SCBRInventoryEvents(), this);
 		getCommand("SCBReborn").setExecutor(new SCBRCommandExecutor());
 		super.onEnable();
 		ArenaManager.getAM().loadGames();

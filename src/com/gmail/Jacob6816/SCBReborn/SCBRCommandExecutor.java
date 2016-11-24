@@ -14,6 +14,7 @@ import com.gmail.Jacob6816.SCBReborn.commands.CommandClass;
 import com.gmail.Jacob6816.SCBReborn.commands.CommandCreate;
 import com.gmail.Jacob6816.SCBReborn.commands.CommandDisableArena;
 import com.gmail.Jacob6816.SCBReborn.commands.CommandEnableArena;
+import com.gmail.Jacob6816.SCBReborn.commands.CommandInfo;
 import com.gmail.Jacob6816.SCBReborn.commands.CommandJoinArena;
 import com.gmail.Jacob6816.SCBReborn.commands.CommandLeaveArena;
 import com.gmail.Jacob6816.SCBReborn.commands.CommandListArenas;
@@ -27,15 +28,16 @@ public class SCBRCommandExecutor implements CommandExecutor {
 	private List<SCBRCommand>	commands;
 
 	public SCBRCommandExecutor() {
-		commands = Arrays.asList(new CommandCreate(), new CommandJoinArena(), new CommandListArenas(), new CommandSetLobby(), new CommandSpawnpoint(), new CommandLeaveArena(), new CommandEnableArena(), new CommandDisableArena(), new CommandClass());
+		commands = Arrays.asList(new CommandCreate(), new CommandDisableArena(), new CommandEnableArena(), new CommandInfo(), new CommandJoinArena(), new CommandLeaveArena(), new CommandListArenas(), new CommandSetLobby(), new CommandSpawnpoint(), new CommandClass());
 		Collections.sort(commands);
 	}
 
 	public void sendCommandList(CommandSender target) {
 		MessageManager.messageRecipient(target, "Usage: /SCBReborn <Command> (Arguments)");
-		MessageManager.messageRecipient(target, "Current Commands are: ");
+		MessageManager.messageRecipient(target, "Commands you can use are:");
 		for (SCBRCommand c : commands)
-			MessageManager.messageRecipient(target, "- " + c.getUsage());
+			if (c.canUseCommand(target))
+				MessageManager.messageRecipient(target, "- " + c.getUsage());
 	}
 
 	public String[] removeFirst(String... input) {
@@ -58,6 +60,7 @@ public class SCBRCommandExecutor implements CommandExecutor {
 			if (command.isCommand(cmd)) {
 				if (!command.canUseCommand(arg0)) {
 					MessageManager.messageRecipient(arg0, ChatColor.RED + "You do not have permission to perform this command.");
+					MessageManager.messageRecipient(arg0, ChatColor.RED + "[ " + command.getPermissionNode() + " ]");
 					return true;
 				}
 				if (arg0 instanceof Player) command.onCommand((Player) arg0, arg3);
