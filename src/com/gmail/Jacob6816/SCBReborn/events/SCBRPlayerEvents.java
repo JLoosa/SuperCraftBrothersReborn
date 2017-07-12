@@ -1,5 +1,6 @@
 package com.gmail.Jacob6816.SCBReborn.events;
 
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,10 +21,10 @@ import com.gmail.Jacob6816.SCBReborn.arenas.ArenaState;
 
 public class SCBRPlayerEvents implements Listener {
 
-	public void onPlayerTeleport(PlayerTeleportEvent event)
-	{
+	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		Arena arena = ArenaManager.getAM().getPlayerArena(event.getPlayer());
-		if (arena == null) return;
+		if (arena == null)
+			return;
 		if (arena.getGameState() == ArenaState.LOBBY)
 			event.setCancelled(true);
 	}
@@ -31,14 +32,15 @@ public class SCBRPlayerEvents implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Arena arena = ArenaManager.getAM().getPlayerArena(event.getPlayer());
-		if (arena == null) return;
+		if (arena == null)
+			return;
 		arena.removePlayer(event.getPlayer());
 	}
 
 	@EventHandler
-	public void onPlayerDropItem(PlayerDropItemEvent event)
-	{
-		if (ArenaManager.getAM().getPlayerArena(event.getPlayer()) == null) return;
+	public void onPlayerDropItem(PlayerDropItemEvent event) {
+		if (ArenaManager.getAM().getPlayerArena(event.getPlayer()) == null)
+			return;
 		event.setCancelled(true);
 	}
 
@@ -48,7 +50,8 @@ public class SCBRPlayerEvents implements Listener {
 			return;
 		Player p = (Player) e.getEntity();
 		Arena arena = ArenaManager.getAM().getPlayerArena(p);
-		if (arena == null) return;
+		if (arena == null)
+			return;
 		if (arena.getGameState() != ArenaState.INGAME) {
 			e.setCancelled(true);
 		}
@@ -61,7 +64,8 @@ public class SCBRPlayerEvents implements Listener {
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		final Player p = e.getEntity();
 		Arena arena = ArenaManager.getAM().getPlayerArena(p);
-		if (arena == null) return;
+		if (arena == null)
+			return;
 		e.getDrops().clear();
 		arena.onDeath(p, e.getDeathMessage());
 		e.setDeathMessage(null);
@@ -69,7 +73,9 @@ public class SCBRPlayerEvents implements Listener {
 			public void run() {
 				try {
 					Object nmsPlayer = p.getClass().getMethod("getHandle").invoke(p);
-					Object packet = Class.forName(nmsPlayer.getClass().getPackage().getName() + ".PacketPlayInClientCommand").newInstance();
+					Object packet = Class
+							.forName(nmsPlayer.getClass().getPackage().getName() + ".PacketPlayInClientCommand")
+							.newInstance();
 					Class<?> enumClass = Class.forName(packet.getClass().getName() + "$EnumClientCommand");
 					for (Object ob : enumClass.getEnumConstants()) {
 						if (ob.toString().equals("PERFORM_RESPAWN")) {
@@ -88,7 +94,8 @@ public class SCBRPlayerEvents implements Listener {
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		Arena arena = ArenaManager.getAM().getPlayerArena(event.getPlayer());
-		if (arena == null) return;
+		if (arena == null)
+			return;
 		arena.respawnPlayer(event);
 	}
 
@@ -96,11 +103,12 @@ public class SCBRPlayerEvents implements Listener {
 	public void onPlayerMove(PlayerMoveEvent e) {
 		Player p = e.getPlayer();
 		Arena arena = ArenaManager.getAM().getPlayerArena(p);
-		if (arena == null) return;
+		if (arena == null)
+			return;
 		if (arena.getGameState() == ArenaState.INGAME)
 			if (p.getHealth() >= 1)
 				if (!arena.getGameRegion().contains(e.getTo()))
-					p.damage(p.getMaxHealth());
+					p.damage(p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 
 	}
 

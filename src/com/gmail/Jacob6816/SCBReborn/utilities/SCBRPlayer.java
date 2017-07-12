@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -16,10 +17,10 @@ import com.gmail.Jacob6816.SCBReborn.classes.PlayerClassManager;
 
 public class SCBRPlayer {
 
-	private Player					player;
-	private ConfigurablePlayerClass	playerClass;
-	private int						livesRemaining;
-	private PlayerBackup			playerBackup;
+	private Player player;
+	private ConfigurablePlayerClass playerClass;
+	private int livesRemaining;
+	private PlayerBackup playerBackup;
 
 	public SCBRPlayer(Player player, Arena game) {
 		this.player = player;
@@ -102,15 +103,15 @@ public class SCBRPlayer {
 
 	private class PlayerBackup {
 
-		private double						health;
-		private ItemStack[]					armor, inventory;
-		private int							foodLevel, totalExperience;
-		private Collection<PotionEffect>	potionEffects;
-		private Location					lastLocation;
+		private double health;
+		private ItemStack[] armor, inventory;
+		private int foodLevel, totalExperience;
+		private Collection<PotionEffect> potionEffects;
+		private Location lastLocation;
 
 		public void saveState(Player player) {
 			health = player.getHealth();
-			player.setHealth(player.getMaxHealth());
+			player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 			armor = player.getInventory().getArmorContents();
 			inventory = player.getInventory().getContents();
 			player.getInventory().setArmorContents(new ItemStack[0]);
